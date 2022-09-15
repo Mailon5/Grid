@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<title>{% block title %}{% endblock %}</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<link type="text/css" rel="stylesheet" href="static/grid-base.css">
+		<link type="text/css" rel="stylesheet" href="static/grid-popupmenu.css">
+		<link type="text/css" rel="stylesheet" href="static/bootstrap.min.css">
+		<script type="text/javascript" language="javascript" src="/static/jquery-3.6.0.js"></script>
+		<script type="text/javascript" language="javascript" src="/static/popper.min.js"></script>
+		<script type="text/javascript" language="javascript" src="/static/bootstrap.min.js"></script>
+	</head> 
+	<body>
+		<nav class="navbar navbar-expand-lg navbar-light bg-light">
+			<a class="navbar-brand" href="#">Grid</a>
+
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item active">
+						<a class="nav-link" href="/">Salas</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/teachers">Professores</a>
+					</li>
+					<li>
+						<a class="nav-link" href="/matters">Matérias</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#">ajuda</a>
+					</li>
+				</ul>
+			</div>
+		</nav>
+		<header>
+			<h1>{% block main_title %}{% endblock %}</h1>
+		</header>
+		<main>
+			{% block main %}
+			{% endblock %}
+		</main>
+		<footer>
+			&copy; Copyright Mailon
+		</footer>
+	</body>
+</html>

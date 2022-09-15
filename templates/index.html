@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block title %}Grid{% endblock %}
+{% block main_title %}Salas da escola{% endblock %}
+{% block main %}
+<div class="dropdown">
+	<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownForm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+		Adicionar nova sala
+	</button>
+	<div class="dropdown-menu" aria-labelledby="dropdownForm">
+		<form class="px-4 py-3" method="post" action="/add?table=classRooms">
+			<div class="form-group">
+				<input name="name" type="text" class="form-control" placeholder="Nome da Sala" autocomplete="off">
+			</div>
+			<div class="form-group">
+				<input name="grade" type="text" class="form-control" placeholder="Série" autocomplete="off">
+			</div>
+			<button type="submit" class="btn btn-primary">Adicionar</button>
+		</form>
+	</div>
+</div>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Nome</th><th>Série</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for classRoom in classRooms %}
+		<tr>
+			<td>
+				<div class="dropdown">
+					<button class="btn btn-secundary dropdown-toggle" type="button" id="dropdownMenuClassRoom" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ classRoom[1] }}</button>
+					<div class="dropdown-menu" aria-labelledby="dropdownMenuClassRoom">
+						<a href="matters.html?id={{ classRoom[0] }}" class="dropdown-item" type="link">Teachers</a>
+						<a class="dropdown-item" type="link" href="/remove?table=classRooms&id={{ classRoom[0] }}">Remover</a>
+					</div>
+				</div>
+			</td>
+			<td>{{ classRoom[2] }}&ordm; ano</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

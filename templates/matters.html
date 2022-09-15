@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}Grid - Matérias{% endblock %}
+{% block main_title %}Matérias da escola{% endblock %}
+{% block main %}
+
+<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownForm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Adicionar nova Matéria
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownForm">
+        <form class="px-4 py-3" method="post" action="/add?table=matters">
+
+            <div class="form-group">
+                <input name="name" type="text" class="form-control" placeholder="Matéria" autocomplete="off"/>
+            </div>
+            <button type="submit" class="btn btn-primary">Adicionar</button>
+        </form>
+    </div>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nome</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for matter in matters %}
+        <tr>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-secundary dropdown-toggle" type="button" id="dropdownMenuMatter" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ matter[1] }}</button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuMatter">
+                        <a class="dropdown-item" type="link" href="/remove?table=matters&id={{ matter[0] }}">Remover</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

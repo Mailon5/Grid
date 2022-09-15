@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}Grid - Máterias do professor{% endblock %}
+{% block main_title %}Máterias de {{ teacher_name }}{% endblock %}
+{% block main %}
+<div class="dropdown">
+	<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownForm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		Adicionar nova matéria
+	</button>
+	<div class="dropdown-menu" aria-labelledby="dropdownForm">
+		<form class="px-4 py-3" method="post" action="/add?table=teacher_matters&teacher_id={{ teacher_id }}&teacher_name={{ teacher_name }}">
+			<div class="form-group">
+				<select name="matter_id" class="form-select form-control">
+					<option value="" visibility="invisible" selected disabled>Máterias da escola</option>
+					{% for matter in school_matters %}
+					<option value={{ matter[0] }}>{{ matter[1] }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<button type="submit" class="btn btn-primary">Adicionar</button>
+		</form> 
+	</div>
+</div>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Nome</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for matter in matters %}
+		<tr>
+			<td>
+				<div class="dropdown">
+					<button class="btn btn-secundary dropdown-toggle" type="button" id="dropdownMenuTeacherMatters" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ matter[2] }}</button>
+					<div class="dropdown-menu" aria-labelledby="dropdownMenuTeacherMatters">
+						<a class="dropdown-item" type="link" href="/remove?table=teacher_matters&id={{ matter[0] }}&teacher_id={{ teacher_id }}&teacher_name={{ teacher_name }}">Remover</a>
+					</div>
+				</div>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}
