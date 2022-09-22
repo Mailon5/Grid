@@ -8,7 +8,7 @@
 		Adicionar nova sala
 	</button>
 	<div class="dropdown-menu" aria-labelledby="dropdownForm">
-		<form class="px-4 py-3" method="post" action="/add?table=classRooms">
+		<form class="px-4 py-3" method="post" action="/add?table=classrooms">
 			<div class="form-group">
 				<input name="name" type="text" class="form-control" placeholder="Nome da Sala" autocomplete="off">
 			</div>
@@ -26,18 +26,18 @@
 		</tr>
 	</thead>
 	<tbody>
-		{% for classRoom in classRooms %}
+		{% for classroom in classrooms %}
 		<tr>
 			<td>
 				<div class="dropdown">
-					<button class="btn btn-secundary dropdown-toggle" type="button" id="dropdownMenuClassRoom" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ classRoom[1] }}</button>
-					<div class="dropdown-menu" aria-labelledby="dropdownMenuClassRoom">
-						<a href="matters.html?id={{ classRoom[0] }}" class="dropdown-item" type="link">Teachers</a>
-						<a class="dropdown-item" type="link" href="/remove?table=classRooms&id={{ classRoom[0] }}">Remover</a>
+					<button class="btn btn-secundary dropdown-toggle" type="button" id="dropdownMenuClassroom" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ classroom[1] }}</button>
+					<div class="dropdown-menu" aria-labelledby="dropdownMenuClassroom">
+						<a href="/classroom_teachers?classroom_id={{ classroom[0] }}&classroom_name={{ classroom[1] }}" class="dropdown-item" type="link">Teachers</a>
+						<a class="dropdown-item" type="link" href="/remove?table=classrooms&id={{ classroom[0] }}">Remover</a>
 					</div>
 				</div>
 			</td>
-			<td>{{ classRoom[2] }}&ordm; ano</td>
+			<td>{{ classroom[2] }}&ordm; ano</td>
 		</tr>
 		{% endfor %}
 	</tbody>

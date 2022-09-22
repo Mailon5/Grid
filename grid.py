@@ -4,14 +4,15 @@ from flask import Flask, render_template, request, redirect
 import sqlite3
 
 # Database name 
-DATABASE_NAME           = 'grid.db'    # name of the database
-TABLE_CLASSROOMS        = 'classRooms' # name of the table to classrooms
-TABLE_TEACHERS          = 'teachers'   # name of the table to teachers
-TABLE_MATTERS           = 'matters'    # name of the table to matters
-TABLE_TEACHER_MATTERS   =  'teacher_matters' # name of the table to teachers matters
+DATABASE_NAME            = 'grid.db'    # name of the database
+TABLE_CLASSROOMS         = 'classrooms' # name of the table to classrooms
+TABLE_TEACHERS           = 'teachers'   # name of the table to teachers
+TABLE_MATTERS            = 'matters'    # name of the table to matters
+TABLE_TEACHER_MATTERS    = 'teacher_matters' # name of the table to teacher matters
+TABLE_CLASSROOM_TEACHERS = 'classroom_teachers' # name of the table to classroom teachers
 
 # Array with all tables
-tables = [TABLE_CLASSROOMS, TABLE_TEACHERS, TABLE_MATTERS,TABLE_TEACHER_MATTERS]
+tables = [TABLE_CLASSROOMS, TABLE_TEACHERS, TABLE_MATTERS,TABLE_TEACHER_MATTERS, TABLE_CLASSROOM_TEACHERS]
 
 # Define app
 app = Flask(__name__)
@@ -22,10 +23,10 @@ def index():
     # Read record classrooms
     with sqlite3.connect(DATABASE_NAME) as _db:
         # Query classrooms
-        cursor = _db.execute('SELECT id, name, grade FROM classRooms;')
-        classRooms = list(cursor)
+        cursor = _db.execute('SELECT id, name, grade FROM classrooms;')
+        classrooms = list(cursor)
         cursor.close()
-    return render_template('index.html',classRooms=classRooms)
+    return render_template('index.html',classrooms=classrooms)
 
 # Teacheas page
 @app.route('/teachers')
@@ -60,7 +61,7 @@ def teacher_matters():
     with sqlite3.connect(DATABASE_NAME) as _db:
         cursor = _db.cursor()
         # Get teacher's matters
-        cursor.execute('SELECT id, matter_id FROM teacher_matters WHERE matter_id IN (SELECT matter_id FROM teacher_matters WHERE teacher_id = ' + teacher_id + ') GROUP BY id')
+        cursor.execute('SELECT id, matter_id FROM teacher_matters WHERE teacher_id = ' + teacher_id)
         matters = list(cursor)
         named_matters = []
         # Get matters names
@@ -69,12 +70,37 @@ def teacher_matters():
             named_matter = [*matter, name]
             named_matters.append(named_matter)
         matters = named_matters
-        print(matters)
         # Get school's matters
         cursor.execute('SELECT id, name FROM matters')
         school_matters = list(cursor)
         cursor.close()
     return render_template('teacher_matters.html',matters=matters,teacher_id=teacher_id,teacher_name=teacher_name,school_matters=school_matters)
+
+# Classroom's teachers
+@app.route("/classroom_teachers")
+def classroom_teachers():
+    # Get classroom id
+    classroom_id = request.args.get('classroom_id')
+    # Get classroom name
+    classroom_name = request.args.get('classroom_name')
+    # Connect to main database
+    with sqlite3.connect(DATABASE_NAME) as _db:
+        cursor = _db.cursor()
+        # Get classroom teachers
+        cursor.execute('SELECT id, teacher_id FROM ' + TABLE_CLASSROOM_TEACHERS + ' WHERE classroom_id = ' + classroom_id)
+        teachers = list(cursor)
+        # Get teachers names
+        named_teachers = []
+        for teacher in teachers:
+            name = list(cursor.execute('SELECT name FROM teachers WHERE id = %d'%(teacher[1])))[0][0]
+            named_teacher = [*teacher, name]
+            named_teachers.append(named_teacher)
+        teachers = named_teachers
+        # Get school's teachers
+        cursor = _db.execute('SELECT id, name FROM teachers')
+        school_teachers = list(cursor)
+        cursor.close()
+    return render_template('classroom_teachers.html',classroom_name=classroom_name,classroom_id=classroom_id,teachers=teachers,school_teachers=school_teachers)
 
 # Add some thing in some table 
 @app.route('/add',methods=['GET','POST'])
@@ -119,6 +145,18 @@ def add():
         with sqlite3.connect(DATABASE_NAME) as _db:
             _db.execute('INSERT INTO ' + TABLE_TEACHER_MATTERS + '(teacher_id, matter_id) VALUES (%s, %s)'%(teacher_id, matter_id))
         return redirect('/teacher_matters?id=' + teacher_id + '&name=' + teacher_name)
+    # Set teacher to some classroom
+    elif table == TABLE_CLASSROOM_TEACHERS:
+        # Get classroom id
+        classroom_id = request.args.get("classroom_id")
+        # Get classroom name
+        classroom_name = request.args.get("classroom_name")
+        # Get teacher id
+        teacher_id = request.form.get("teacher")
+        # Record classroom teacher
+        with sqlite3.connect(DATABASE_NAME) as _db:
+            _db.execute('INSERT INTO ' + TABLE_CLASSROOM_TEACHERS + '(classroom_id, teacher_id) VALUES (%s,%s)'%(classroom_id, teacher_id))
+        return redirect('/classroom_teachers?classroom_name=' + classroom_name + '&classroom_id=' + classroom_id)
     return redirect('/')
 
 # Remove some thing in some table
@@ -141,6 +179,12 @@ def remove():
         # Get teacher name
         teacher_name = request.args.get("teacher_name")
         return redirect('/teacher_matters?id=' + teacher_id + '&name=' + teacher_name)
+    elif table == TABLE_CLASSROOM_TEACHERS:
+        # Get classroom id
+        classroom_id = request.args.get("classroom_id")
+        # Get classroom name
+        classroom_name = request.args.get("classroom_name")
+        return  redirect('/classroom_teachers?classroom_name=' + classroom_name + '&classroom_id=' + classroom_id)
     return redirect('/')
 
 # Execute the program
@@ -153,8 +197,10 @@ if __name__ == '__main__':
         _db.execute('CREATE TABLE IF NOT EXISTS ' + TABLE_TEACHERS + '(id INTEGER NOT NULL, name TEXT, PRIMARY KEY(id));')
         # Create matter's table 
         _db.execute('CREATE TABLE IF NOT EXISTS ' + TABLE_MATTERS + '(id INTEGER NOT NULL, name TEXT, PRIMARY KEY(id));')
-        # Create teachers matters table
+        # Create teacher matters table
         _db.execute('CREATE TABLE IF NOT EXISTS ' + TABLE_TEACHER_MATTERS + '(id INTEGER NOT NULL,teacher_id INTEGER NOT NULL, matter_id INTEGER NOT NULL, PRIMARY KEY(id), FOREIGN KEY(teacher_id) REFERENCES teachers(id), FOREIGN KEY(matter_id) REFERENCES matters(id));')
+        # Create classroom teachers table
+        _db.execute('CREATE TABLE IF NOT EXISTS ' + TABLE_CLASSROOM_TEACHERS + '(id INTEGER NOT NULL,classroom_id INTEGER NOT NULL, teacher_id INTEGER NOT NULL, PRIMARY KEY(id), FOREIGN KEY(classroom_id) REFERENCES classrooms(id), FOREIGN KEY(teacher_id) REFERENCES teachers(id))')
     # Run app
     #app.run(host=os.environ['LOCAL_IP'],debug=False) # Visible to local wifi
     app.run(debug=True)
